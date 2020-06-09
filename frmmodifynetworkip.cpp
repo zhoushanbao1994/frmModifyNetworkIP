@@ -33,25 +33,30 @@ frmModifyNetworkIP::~frmModifyNetworkIP()
 void frmModifyNetworkIP::getNetworkInterface()    // 获取本机网络信息
 {
     QList<QNetworkInterface> ifaceList = QNetworkInterface::allInterfaces();
+    ui->comboBox->clear();
+    ui->textEdit->clear();
     for (int i = 0; i < ifaceList.count(); i++)
     {
         QNetworkInterface var = ifaceList.at(i);
         ui->comboBox->addItem(var.humanReadableName());
-        qDebug() << (QString("############################## 设备%1 ################################").arg(i));
-        qDebug() << (QString("接口名称：%1").arg(var.humanReadableName()));
-        qDebug() << (QString("设备名称：%1").arg(var.name()));
-        qDebug() << (QString("硬件地址：%1").arg(var.hardwareAddress()));
+        ui->textEdit->append(QString("############################## 设备%1 ################################").arg(i));
+        ui->textEdit->append(QString("接口名称：%1").arg(var.humanReadableName()));
+        ui->textEdit->append(QString("设备名称：%1").arg(var.name()));
+        ui->textEdit->append(QString("硬件地址：%1").arg(var.hardwareAddress()));
+        if(var.hardwareAddress() == "") {
+            continue;
+        }
 
-        qDebug() << (QString("IP地址列表："));
+        ui->textEdit->append(QString("IP地址列表："));
         // 读取一个IP地址的关联信息列表
         QList<QNetworkAddressEntry> entryList = var.addressEntries();
         for(int j = 0; j < entryList.count(); j++)
         {
             QNetworkAddressEntry entry = entryList.at(j);
-            qDebug() << (QString("  %1_地址：").arg(j));
-            qDebug() << (QString("    IP地址：%1").arg(entry.ip().toString()));
-            qDebug() << (QString("    子网掩码：%1").arg(entry.netmask().toString()));
-            qDebug() << (QString("    广播地址：%1").arg(entry.broadcast().toString()));
+            ui->textEdit->append(QString("  %1_地址：").arg(j));
+            ui->textEdit->append(QString("    IP地址：%1").arg(entry.ip().toString()));
+            ui->textEdit->append(QString("    子网掩码：%1").arg(entry.netmask().toString()));
+            ui->textEdit->append(QString("    广播地址：%1").arg(entry.broadcast().toString()));
         }
     }
 }
@@ -59,6 +64,7 @@ void frmModifyNetworkIP::getNetworkInterface()    // 获取本机网络信息
 void frmModifyNetworkIP::on_pushButton_clicked()
 {
     ui->label->setText("");
+    this->getNetworkInterface();
 
     QString name    = ui->comboBox->currentText();
     QString ip      = ui->lineEdit_ip->text();
